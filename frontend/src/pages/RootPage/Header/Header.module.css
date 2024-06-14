@@ -1,0 +1,24 @@
+.container {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  justify-content: flex-end;
+
+  height: 64px;
+  padding: 0 48px;
+
+  background-color: #fff;
+}
+
+.button {
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 5px;
+}
+
+.button > span {
+  font-size: 1.375rem;
+  color: #000;
+}

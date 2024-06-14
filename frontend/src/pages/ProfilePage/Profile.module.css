@@ -1,0 +1,7 @@
+.container {
+  padding: 16px 48px;
+}
+
+.container > p {
+  font-size: 1.125rem;
+}

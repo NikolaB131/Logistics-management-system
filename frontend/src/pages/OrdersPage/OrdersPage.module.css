@@ -1,0 +1,27 @@
+.container {
+  padding: 16px 48px;
+}
+
+.top_section {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.edit_button {
+  gap: 4px;
+}
+
+.filter_button {
+  gap: 5px;
+  margin-left: auto;
+}
+
+.search_input {
+  width: 300px;
+  height: 48px;
+
+  background-color: #fff;
+  border: 1px solid var(--color-neutral-3);
+  border-radius: 8px;
+}

@@ -1,0 +1,25 @@
+.container {
+  position: sticky;
+  top: 0;
+
+  align-self: flex-start;
+
+  min-width: 320px;
+  padding-top: 64px;
+}
+
+.list > li > a {
+  display: flex;
+  align-items: center;
+
+  height: 60px;
+  padding-left: 32px;
+
+  font-size: 1.75rem;
+  color: var(--color-neutral-3);
+}
+
+.list > li > a.active {
+  color: var(--color-neutral-4);
+  background-color: var(--color-primary);
+}

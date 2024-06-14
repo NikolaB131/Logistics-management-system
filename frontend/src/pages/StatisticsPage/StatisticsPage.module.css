@@ -1,0 +1,29 @@
+.today_container {
+  padding: 16px 48px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.info_title {
+  font-size: 1.25rem;
+  margin-bottom: 12px;
+}
+
+.charts {
+  display: flex;
+  gap: 48px;
+}
+
+.table_container {
+  align-self: flex-start;
+}
+
+.table_container > h3 {
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin-bottom: 16px;
+}
+
+.month_container {
+  padding: 16px 48px;
+}

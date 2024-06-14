@@ -1,0 +1,14 @@
+.container {
+  display: flex;
+  align-items: center;
+
+  height: 40px;
+  padding: 0 48px;
+
+  background-color: var(--color-neutral-1);
+}
+
+.container > h1 {
+  font-size: 1.375rem;
+  font-weight: 400;
+}

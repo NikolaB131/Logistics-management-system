@@ -1,0 +1,43 @@
+.button {
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 48px;
+  padding: 0 16px;
+
+  font-size: 1.125rem;
+
+  border-radius: 12px;
+
+  transition: all 0.2s linear;
+}
+
+.mode1 {
+  color: #fff;
+  background-color: var(--color-primary);
+}
+
+.mode1:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.mode2 {
+  color: #000;
+  background-color: var(--color-neutral-1);
+}
+
+.mode2:hover {
+  background-color: var(--color-neutral-1-hover);
+}
+
+.mode3 {
+  color: #fff;
+  background-color: var(--color-error);
+}
+
+.mode3:hover {
+  background-color: var(--color-error-hover);
+}

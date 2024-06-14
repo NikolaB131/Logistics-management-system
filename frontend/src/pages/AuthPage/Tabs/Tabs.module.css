@@ -1,0 +1,41 @@
+.container {
+  width: fit-content;
+}
+
+.buttons_container {
+  display: flex;
+  gap: 24px;
+}
+
+.button {
+  cursor: pointer;
+  padding-bottom: 6px;
+  font-size: 1.125rem;
+  background-color: transparent;
+}
+
+.slider {
+  position: relative;
+  height: 2px;
+  background-color: var(--color-neutral-1)
+}
+
+.slider::after {
+  content: '';
+
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+
+  width: 28%;
+
+  background-color: var(--color-primary);
+
+  transition: all 0.3s ease-in-out;
+}
+
+.right.slider::after {
+  left: 33%;
+  width: 67%;
+}
