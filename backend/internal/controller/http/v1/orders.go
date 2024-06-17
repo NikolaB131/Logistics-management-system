@@ -17,9 +17,8 @@ import (
 
 type (
 	OrdersService interface {
-		GetOrders(ctx context.Context) ([]entity.Order, error)
+		GetOrders(ctx context.Context) ([]service.EnhancedOrder, error)
 		Create(ctx context.Context,
-			courierID uint64,
 			clientID uint64,
 			addressFrom string,
 			addressTo string,
@@ -50,7 +49,6 @@ type (
 	}
 
 	orderCreateBody struct {
-		CourierID    uint64             `json:"courier_id" binding:"required"`
 		ClientID     uint64             `json:"client_id" binding:"required"`
 		AddressFrom  string             `json:"address_from" binding:"required"`
 		AddressTo    string             `json:"address_to" binding:"required"`
@@ -97,7 +95,7 @@ func (r *ordersRoutes) getOrders(c *gin.Context) {
 	}
 
 	if len(orders) == 0 {
-		orders = []entity.Order{}
+		orders = []service.EnhancedOrder{}
 	}
 
 	c.JSON(http.StatusOK, orders)
@@ -119,7 +117,6 @@ func (r *ordersRoutes) createOrder(c *gin.Context) {
 	}
 
 	id, err := r.ordersService.Create(c,
-		body.CourierID,
 		body.ClientID,
 		body.AddressFrom,
 		body.AddressTo,
@@ -163,10 +160,12 @@ func (r *ordersRoutes) updateOrder(c *gin.Context) {
 		return
 	}
 
-	for _, item := range *body.Items {
-		if item.Quantity < 1 {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "quantity of item cant be less than 1"})
-			return
+	if body.Items != nil {
+		for _, item := range *body.Items {
+			if item.Quantity < 1 {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "quantity of item cant be less than 1"})
+				return
+			}
 		}
 	}
 

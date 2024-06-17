@@ -44,15 +44,14 @@ func (r *AuthRoutes) login(c *gin.Context) {
 		return
 	}
 
-	token, err := r.authService.Login(c, body.Email, body.Password)
+	token, user, err := r.authService.Login(c, body.Email, body.Password)
 	if err != nil {
 		slog.Error(err.Error())
 		c.Status(http.StatusInternalServerError)
 		return
 	}
 
-	c.SetCookie("token", token, 60*60, "/", "localhost", false, true) // http, not https
-	c.Status(http.StatusOK)
+	c.JSON(http.StatusOK, gin.H{"token": token, "email": user.Email, "role": user.Role})
 }
 
 func (r *AuthRoutes) register(c *gin.Context) {

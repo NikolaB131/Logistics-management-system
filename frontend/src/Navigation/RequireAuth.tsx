@@ -1,12 +1,13 @@
-// import { Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { Navigate } from 'react-router-dom';
 
-// import { useAuth } from '../hooks/useAuth';
+import { authTokenSelector } from '../redux/slices/auth/selectors';
 
 const RequireAuth = ({ children }: { children: React.ReactNode }) => {
-  // const { user } = useAuth();
-  // if (!user) {
-  // return <Navigate to="/auth" />;
-  // }
+  const token = useSelector(authTokenSelector);
+  if (!token) {
+    return <Navigate to="/auth" />;
+  }
   return children;
 };
 

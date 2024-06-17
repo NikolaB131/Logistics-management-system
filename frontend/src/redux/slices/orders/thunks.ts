@@ -29,6 +29,22 @@ export const createOrder = createAppAsyncThunk<void, OrderPost>(
   },
 );
 
+export const assignCourier = createAppAsyncThunk<void, { orderID: number; courierID: number }>(
+  'orders/assignCourier',
+  async (payload, { rejectWithValue }) => {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/order/${payload.orderID}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify({ courier_id: payload.courierID }),
+    });
+    if (!response.ok) {
+      return rejectWithValue(await response.text());
+    }
+  },
+);
+
 export const deleteOrder = createAppAsyncThunk<void, number>(
   'orders/deleteOrder',
   async (payload, { rejectWithValue }) => {

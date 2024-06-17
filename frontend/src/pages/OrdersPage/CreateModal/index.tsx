@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { createOrder } from '../../../redux/slices/orders/thunks';
+import { OrderItemPost } from '../../../redux/slices/orders/types';
 import { useAppDispatch } from '../../../redux/utils';
 import Button from '../../../shared/Button';
 import Modal from '../../../shared/Modal';
@@ -16,7 +17,6 @@ type Props = {
 const AddModal = ({ onClose, onAdd }: Props) => {
   const dispatch = useAppDispatch();
 
-  const [courierIDValue, setCourierIDValue] = useState('');
   const [clientIDValue, setClientIDValue] = useState('');
   const [addressFromValue, setAddressFromValue] = useState('');
   const [addressToValue, setAddressToValue] = useState('');
@@ -26,14 +26,19 @@ const AddModal = ({ onClose, onAdd }: Props) => {
   const [notesValue, setNotesValue] = useState('');
 
   const onButtonClick = () => {
+    const rows = itemsValue.split('\n');
+    const items: OrderItemPost[] = [];
+    for (const row of rows) {
+      const temp = row.split(':');
+      items.push({ id: +temp[0], quantity: +temp[1] });
+    }
     dispatch(
       createOrder({
-        courier_id: +courierIDValue,
         client_id: +clientIDValue,
         address_from: addressFromValue,
         address_to: addressToValue,
         deliver_to: deliverToValue,
-        items: [],
+        items,
         delivery_cost: +deliveryCostValue,
         notes: notesValue,
       }),
@@ -45,12 +50,6 @@ const AddModal = ({ onClose, onAdd }: Props) => {
   return (
     <Modal onClose={onClose}>
       <div className={styles.container}>
-        <TextInput
-          containerClassName={styles.input}
-          value={courierIDValue}
-          onChange={e => setCourierIDValue(e.target.value)}
-          placeholder="ID курьера"
-        />
         <TextInput
           containerClassName={styles.input}
           value={clientIDValue}

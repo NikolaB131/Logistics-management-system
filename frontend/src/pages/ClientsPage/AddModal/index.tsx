@@ -38,7 +38,7 @@ const AddModal = ({ onClose, onAdd }: Props) => {
           containerClassName={styles.input}
           value={phoneNumberInputValue}
           onChange={e => setPhoneNumberInputValue(e.target.value)}
-          placeholder="Номер телефона"
+          placeholder="Номер телефона (необязательно)"
         />
         <TextInput
           containerClassName={styles.input}

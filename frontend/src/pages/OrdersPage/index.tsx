@@ -4,14 +4,15 @@ import { useSelector } from 'react-redux';
 import penSvg from '../../assets/pen_with_black_box.svg';
 import triangleSvg from '../../assets/triangle.svg';
 import { isOrdersLoadingSelector } from '../../redux/slices/orders/selectors';
-import { deleteOrder, fetchOrders as fetchOrdersThunk } from '../../redux/slices/orders/thunks';
-import { OrderGet, OrderItem } from '../../redux/slices/orders/types';
+import { assignCourier, deleteOrder, fetchOrders as fetchOrdersThunk } from '../../redux/slices/orders/thunks';
+import { OrderGet, OrderItemGet } from '../../redux/slices/orders/types';
 import { useAppDispatch } from '../../redux/utils';
 import Button from '../../shared/Button';
 import Modal from '../../shared/Modal';
 import TextInput, { TextInputHandle } from '../../shared/TextInput';
 import Header from '../components/Header';
 import Table, { TableHandle } from '../components/Table';
+import AssignModal from './AssignModal';
 import CreateModal from './CreateModal';
 import styles from './OrdersPage.module.css';
 
@@ -28,6 +29,7 @@ const OrdersPage = () => {
   const [searchFieldValue, setSearchFieldValue] = useState('');
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
+  const [isAssignCourierModalVisible, setIsAssignCourierModalVisible] = useState(false);
 
   const fetchOrders = async () => {
     const orders = await dispatch(fetchOrdersThunk()).unwrap();
@@ -47,7 +49,7 @@ const OrdersPage = () => {
       for (const order of orders) {
         let isContains = false;
         for (const value of Object.values(order)) {
-          if (value.toString().includes(searchFieldValue)) {
+          if (value && value.toString().includes(searchFieldValue)) {
             isContains = true;
             break;
           }
@@ -71,6 +73,14 @@ const OrdersPage = () => {
     setTimeout(fetchOrders, 300);
   };
 
+  const onAssignCourier = async (courierID: number) => {
+    const selected = tableRef.current?.getSelectedIDs();
+    if (selected?.length === 1) {
+      await dispatch(assignCourier({ orderID: +selected[0], courierID }));
+      fetchOrders();
+    }
+  };
+
   const convertStatus = (status: string) => {
     switch (status) {
       case 'not_ready':
@@ -85,9 +95,13 @@ const OrdersPage = () => {
     return '-';
   };
 
-  const convertItems = (items: OrderItem[]) => {
-
-  }
+  const convertItems = (items: OrderItemGet[]) => {
+    let res = '';
+    for (const item of items) {
+      res += `${item.name}\xa0-\xa0${item.quantity}\n`;
+    }
+    return res;
+  };
 
   return (
     <>
@@ -99,7 +113,14 @@ const OrdersPage = () => {
             <img src={penSvg} />
             Редактировать
           </Button>
-          <Button onClick={() => {}} mode="mode2">
+          <Button
+            onClick={() => {
+              if ((tableRef.current?.getSelectedIDs() ?? []).length === 1) {
+                setIsAssignCourierModalVisible(true);
+              }
+            }}
+            mode="mode2"
+          >
             Назначить курьера
           </Button>
           <Button onClick={onDelete} mode="mode3">
@@ -142,17 +163,18 @@ const OrdersPage = () => {
             ]}
             data={visibleOrders.map<string[]>(order => [
               order.id.toString(),
-              order.items.toString(),
+              convertItems(order.items),
               order.client_id.toString(),
               order.deliver_to,
               order.address_from,
               order.address_to,
               order.notes || '-',
-              order.courier_id.toString(),
+              order.courier_id ? order.courier_id.toString() : '-',
               convertStatus(order.status),
               order.created_at + '\n' + (order.delivered_at ?? ''),
-              (order.total_cost - order.delivery_cost).toString(),
               order.total_cost.toString(),
+              order.delivery_cost.toString(),
+              (order.total_cost + order.delivery_cost).toString(),
             ])}
           />
         )}
@@ -164,6 +186,9 @@ const OrdersPage = () => {
       )}
       {isCreateModalVisible && (
         <CreateModal onClose={() => setIsCreateModalVisible(false)} onAdd={() => setTimeout(fetchOrders, 300)} />
+      )}
+      {isAssignCourierModalVisible && (
+        <AssignModal onClose={() => setIsAssignCourierModalVisible(false)} onButtonClick={onAssignCourier} />
       )}
     </>
   );

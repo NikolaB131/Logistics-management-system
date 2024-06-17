@@ -1,33 +1,33 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { login, register } from '../../redux/slices/auth/thunks';
+import { useAppDispatch } from '../../redux/utils';
 import Button from '../../shared/Button';
 import TextInput from '../../shared/TextInput';
 import styles from './AuthPage.module.css';
 import Tabs from './Tabs';
 
 const AuthPage = () => {
+  const dispatch = useAppDispatch();
+
   const [isLeftTabSelected, setIsLeftTabSelected] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  // const loginAndRedirect = async (username: string, password: string) => {
-  //   await dispatch(login({ username, password }));
-  //   const checkLogin = await dispatch(check()).unwrap();
-  //   if (checkLogin.ok) {
-  //     navigate('/home');
-  //   }
-  // };
-
   const navigate = useNavigate();
 
-  const onButtonClick = () => {
+  useEffect(() => {
+    setEmail('');
+    setPassword('');
+  }, [isLeftTabSelected]);
+
+  const onButtonClick = async () => {
     if (isLeftTabSelected) {
+      await dispatch(login({ email, password }));
       navigate('/');
-      // loginAndRedirect(username, password);
     } else {
-      // await dispatch(register({ username, password }));
-      // loginAndRedirect(username, password);
+      await dispatch(register({ email, password }));
     }
   };
 

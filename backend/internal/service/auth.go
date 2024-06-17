@@ -15,7 +15,7 @@ import (
 
 type (
 	AuthService interface {
-		Login(ctx context.Context, email string, password string) (string, error)
+		Login(ctx context.Context, email string, password string) (string, entity.User, error)
 		RegisterUser(ctx context.Context, email string, password string) (string, error)
 		MakeAdmin(ctx context.Context, userID string) error
 	}
@@ -46,22 +46,22 @@ func NewAuthService(userRepository userRepository, signSecret string, tokenTTL t
 	}
 }
 
-func (a *Auth) Login(ctx context.Context, email string, password string) (string, error) {
+func (a *Auth) Login(ctx context.Context, email string, password string) (string, entity.User, error) {
 	user, err := a.userRepository.User(ctx, email)
 	if err != nil {
-		return "", fmt.Errorf("failed to check if user exists: %w", err)
+		return "", user, fmt.Errorf("failed to check if user exists: %w", err)
 	}
 
 	if err := bcrypt.CompareHashAndPassword(user.PasswordHash, []byte(password)); err != nil {
-		return "", ErrInvalidCredentials
+		return "", entity.User{}, ErrInvalidCredentials
 	}
 
 	signedToken, err := jwt.Generate(a.signSecret, a.tokenTTL, user.ID, user.Email)
 	if err != nil {
-		return "", fmt.Errorf("failed to sign token: %w", err)
+		return "", entity.User{}, fmt.Errorf("failed to sign token: %w", err)
 	}
 
-	return signedToken, nil
+	return signedToken, user, nil
 }
 
 func (a *Auth) RegisterUser(ctx context.Context, email string, password string) (string, error) {

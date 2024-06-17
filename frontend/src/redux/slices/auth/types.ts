@@ -1,12 +1,17 @@
 export type AuthState = {
   isLoading: boolean;
+  token: string;
+  email: string;
+  role: string;
 };
 
 export type AuthCredentials = {
-  username: string;
+  email: string;
   password: string;
 };
 
-export type LogoutResult = {
-  ok: boolean;
+export type LoginResponse = {
+  token: string;
+  email: string;
+  role: string;
 };

@@ -38,10 +38,11 @@ func (r *OrdersRepository) GetOrders(ctx context.Context) ([]entity.Order, error
 	var orders []entity.Order
 	for rows.Next() {
 		var order entity.Order
+		var courierID *uint64
 		var notes *string
 		err := rows.Scan(
 			&order.ID,
-			&order.CourierID,
+			&courierID,
 			&order.ClientID,
 			&order.AddressFrom,
 			&order.AddressTo,
@@ -57,6 +58,11 @@ func (r *OrdersRepository) GetOrders(ctx context.Context) ([]entity.Order, error
 		if err != nil {
 			return nil, fmt.Errorf("failed scan row: %w", err)
 		}
+		if courierID == nil {
+			order.CourierID = 0
+		} else {
+			order.CourierID = *courierID
+		}
 		if notes == nil {
 			order.Notes = ""
 		} else {
@@ -69,7 +75,6 @@ func (r *OrdersRepository) GetOrders(ctx context.Context) ([]entity.Order, error
 }
 
 func (r *OrdersRepository) Create(ctx context.Context,
-	courierID uint64,
 	clientID uint64,
 	addressFrom string,
 	addressTo string,
@@ -80,8 +85,8 @@ func (r *OrdersRepository) Create(ctx context.Context,
 	totalCost float32,
 ) (uint64, error) {
 	row := r.Pool.QueryRow(ctx,
-		"INSERT INTO orders (courier_id, client_id, address_from, address_to, notes, deliver_to, items, delivery_cost, total_cost) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id",
-		courierID, clientID, addressFrom, addressTo, notes, deliverTo, items, deliveryCost, totalCost,
+		"INSERT INTO orders (client_id, address_from, address_to, notes, deliver_to, items, delivery_cost, total_cost) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id",
+		clientID, addressFrom, addressTo, notes, deliverTo, items, deliveryCost, totalCost,
 	)
 
 	var id uint64

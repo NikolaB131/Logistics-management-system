@@ -11,11 +11,21 @@ import (
 )
 
 type (
+	EnhancedOrderItem struct {
+		ID       uint64 `json:"id"`
+		Name     string `json:"name"`
+		Quantity int    `json:"quantity"`
+	}
+
+	EnhancedOrder struct {
+		entity.Order
+		Items []EnhancedOrderItem `json:"items"`
+	}
+
 	orderRepository interface {
 		IsExistsById(ctx context.Context, id uint64) (bool, error)
 		GetOrders(ctx context.Context) ([]entity.Order, error)
 		Create(ctx context.Context,
-			courierID uint64,
 			clientID uint64,
 			addressFrom string,
 			addressTo string,
@@ -47,9 +57,14 @@ type (
 		Update(ctx context.Context, id uint64, name *string, quantity *int, cost *float32, lastSupplyDate *time.Time) error
 	}
 
+	couriersRepository interface {
+		Update(ctx context.Context, id uint64, name *string, phoneNumber *string, carNumber *string, status *string, notes *string) error
+	}
+
 	Orders struct {
-		orderRepository orderRepository
-		itemsRepository ordersItemsRepository
+		orderRepository    orderRepository
+		itemsRepository    ordersItemsRepository
+		couriersRepository couriersRepository
 	}
 )
 
@@ -58,21 +73,32 @@ var (
 	ErrItemNotEnough  = errors.New("item is not enough")
 )
 
-func NewOrdersService(orderRepository orderRepository, itemsRepository ordersItemsRepository) *Orders {
-	return &Orders{orderRepository, itemsRepository}
+func NewOrdersService(orderRepository orderRepository, itemsRepository ordersItemsRepository, couriersRepository couriersRepository) *Orders {
+	return &Orders{orderRepository, itemsRepository, couriersRepository}
 }
 
-func (c *Orders) GetOrders(ctx context.Context) ([]entity.Order, error) {
+func (c *Orders) GetOrders(ctx context.Context) ([]EnhancedOrder, error) {
+	var enhancedOrders []EnhancedOrder
 	orders, err := c.orderRepository.GetOrders(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get orders: %w", err)
 	}
+	for _, order := range orders {
+		var newItems []EnhancedOrderItem
+		for _, item := range order.Items {
+			dbItem, err := c.itemsRepository.GetItemByID(ctx, item.ID)
+			if err != nil {
+				return nil, fmt.Errorf("failed to get item by id: %w", err)
+			}
+			newItems = append(newItems, EnhancedOrderItem{ID: item.ID, Name: dbItem.Name, Quantity: item.Quantity})
+		}
+		enhancedOrders = append(enhancedOrders, EnhancedOrder{Order: order, Items: newItems})
+	}
 
-	return orders, nil
+	return enhancedOrders, nil
 }
 
 func (c *Orders) Create(ctx context.Context,
-	courierID uint64,
 	clientID uint64,
 	addressFrom string,
 	addressTo string,
@@ -101,7 +127,7 @@ func (c *Orders) Create(ctx context.Context,
 		totalCost += dbItem.Cost * float32(item.Quantity)
 	}
 
-	id, err := c.orderRepository.Create(ctx, courierID, clientID, addressFrom, addressTo, notes, deliverTo, items, deliveryCost, totalCost)
+	id, err := c.orderRepository.Create(ctx, clientID, addressFrom, addressTo, notes, deliverTo, items, deliveryCost, totalCost)
 	if err != nil {
 		return 0, fmt.Errorf("failed to create order: %w", err)
 	}
@@ -154,6 +180,12 @@ func (c *Orders) Update(ctx context.Context,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to update order: %w", err)
+	}
+	if courierID != nil {
+		err := c.couriersRepository.Update(ctx, *courierID, nil, nil, nil, &entity.CourierStatusBusy, nil)
+		if err != nil {
+			return fmt.Errorf("failed to update courier status: %w", err)
+		}
 	}
 
 	return nil

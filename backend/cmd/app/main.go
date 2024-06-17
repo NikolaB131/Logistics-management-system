@@ -48,7 +48,7 @@ func main() {
 	clientsService := service.NewClientsService(clientRepository)
 	couriersService := service.NewCouriersService(couriersRepository)
 	warehouseService := service.NewWarehouseService(itemsRepository)
-	ordersService := service.NewOrdersService(ordersRepository, itemsRepository)
+	ordersService := service.NewOrdersService(ordersRepository, itemsRepository, couriersRepository)
 
 	// Creating admin user
 	adminID, err := authService.RegisterUser(context.Background(), config.Auth.AdminUsername, config.Auth.AdminPassword)

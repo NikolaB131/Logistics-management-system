@@ -7,6 +7,7 @@ import MainModule from '@yandex/ymaps3-types/react';
 import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useSelector } from 'react-redux';
+import { couriersMapInfoSelector } from '../../redux/slices/couriers/selectors';
 
 type YMapAPIType = typeof MainModule & typeof ControlsModule & typeof MarkersModule;
 
@@ -16,7 +17,7 @@ const Map = () => {
 
   const [YMapAPI, setYMapAPI] = useState<YMapAPIType | null>(null);
 
-  // const couriersData = useSelector(couriersOnMapSelector);
+  const couriersMapInfo = useSelector(couriersMapInfoSelector);
 
   useEffect(() => {
     (async () => {
@@ -55,14 +56,14 @@ const Map = () => {
         <YMapZoomControl />
       </YMapControls>
 
-      {/* {couriersData.map((data, i) => (
+      {couriersMapInfo.map((data, i) => (
         <YMapDefaultMarker
           key={i}
           ref={ref => (markersRefs.current[i] = ref)}
-          coordinates={data.coordinates}
+          coordinates={[data.geo[1], data.geo[0]]}
           title={data.name}
         />
-      ))} */}
+      ))}
     </YMap>
   );
 };

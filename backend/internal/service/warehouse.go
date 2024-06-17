@@ -45,7 +45,7 @@ func (w *Warehouse) GetItems(ctx context.Context) ([]entity.Item, error) {
 func (w *Warehouse) GetItemByID(ctx context.Context, id uint64) (entity.Item, error) {
 	item, err := w.itemsRepository.GetItemByID(ctx, id)
 	if err != nil {
-		return entity.Item{}, fmt.Errorf("failed to get Items: %w", err)
+		return entity.Item{}, fmt.Errorf("failed to get item: %w", err)
 	}
 
 	return item, nil

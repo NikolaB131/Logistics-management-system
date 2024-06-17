@@ -45,7 +45,7 @@ const ClientsPage = () => {
       for (const client of clients) {
         let isContains = false;
         for (const value of Object.values(client)) {
-          if (value.toString().includes(searchFieldValue)) {
+          if (value && value.toString().includes(searchFieldValue)) {
             isContains = true;
             break;
           }
