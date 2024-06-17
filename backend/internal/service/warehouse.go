@@ -14,6 +14,7 @@ type (
 	warehouseItemsRepository interface {
 		IsExistsById(ctx context.Context, id uint64) (bool, error)
 		GetItems(ctx context.Context) ([]entity.Item, error)
+		GetItemByID(ctx context.Context, id uint64) (entity.Item, error)
 		Create(ctx context.Context, name string, quantity int, cost float32, lastSupplyDate *time.Time) (uint64, error)
 		Update(ctx context.Context, id uint64, name *string, quantity *int, cost *float32, lastSupplyDate *time.Time) error
 		DeleteByID(ctx context.Context, id uint64) error
@@ -39,6 +40,15 @@ func (w *Warehouse) GetItems(ctx context.Context) ([]entity.Item, error) {
 	}
 
 	return items, nil
+}
+
+func (w *Warehouse) GetItemByID(ctx context.Context, id uint64) (entity.Item, error) {
+	item, err := w.itemsRepository.GetItemByID(ctx, id)
+	if err != nil {
+		return entity.Item{}, fmt.Errorf("failed to get Items: %w", err)
+	}
+
+	return item, nil
 }
 
 func (w *Warehouse) Create(ctx context.Context, name string, quantity int, cost float32, lastSupplyDate *time.Time) (uint64, error) {

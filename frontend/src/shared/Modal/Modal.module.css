@@ -21,7 +21,7 @@
 .close_button_container {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 6px;
+  margin-bottom: 12px;
 }
 
 .close_button {

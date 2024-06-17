@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"time"
 
 	"github.com/NikolaB131/logistics-management-system/config"
 	v1 "github.com/NikolaB131/logistics-management-system/internal/controller/http/v1"
@@ -13,6 +14,7 @@ import (
 	postgresRepo "github.com/NikolaB131/logistics-management-system/internal/repository/postgres"
 	"github.com/NikolaB131/logistics-management-system/internal/service"
 	"github.com/NikolaB131/logistics-management-system/pkg/postgres"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -65,6 +67,13 @@ func main() {
 
 	// Routes
 	r := gin.New()
+	r.Use(cors.New(cors.Config{
+		AllowMethods:     []string{"POST, OPTIONS, GET, PUT, DELETE, PATCH"},
+		AllowHeaders:     []string{"Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization", "accept", "origin", "Cache-Control", "X-Requested-With"},
+		AllowCredentials: true,
+		AllowAllOrigins:  true,
+		MaxAge:           1 * time.Minute,
+	}))
 	v1.NewRouter(r, middlewares, authService, clientsService, couriersService, warehouseService, ordersService)
 
 	r.Run(fmt.Sprintf(":%d", config.HTTP.Port))

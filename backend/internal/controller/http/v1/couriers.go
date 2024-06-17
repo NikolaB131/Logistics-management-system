@@ -47,10 +47,10 @@ func newCouriersRoutes(g *gin.RouterGroup, couriersService CouriersService) {
 
 	couriers := g.Group("/courier")
 	{
-		couriers.GET("/", couriersR.getCouriers)
-		couriers.POST("/", couriersR.createCourier)
-		couriers.PATCH("/:id", couriersR.updateCourier)
-		couriers.DELETE("/:id", couriersR.deleteCourier)
+		couriers.GET("", couriersR.getCouriers)
+		couriers.POST("", couriersR.createCourier)
+		couriers.PATCH(":id", couriersR.updateCourier)
+		couriers.DELETE(":id", couriersR.deleteCourier)
 	}
 }
 

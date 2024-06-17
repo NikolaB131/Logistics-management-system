@@ -23,8 +23,8 @@ func newAuthRoutes(g *gin.RouterGroup, authService service.AuthService) {
 
 	auth := g.Group("/auth")
 	{
-		auth.POST("/login", authR.login)
-		auth.POST("/register", authR.register)
+		auth.POST("login", authR.login)
+		auth.POST("register", authR.register)
 	}
 }
 

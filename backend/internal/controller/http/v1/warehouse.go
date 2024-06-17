@@ -17,6 +17,7 @@ import (
 type (
 	WarehouseService interface {
 		GetItems(ctx context.Context) ([]entity.Item, error)
+		GetItemByID(ctx context.Context, id uint64) (entity.Item, error)
 		Create(ctx context.Context, name string, quantity int, cost float32, lastSupplyDate *time.Time) (uint64, error)
 		Update(ctx context.Context, id uint64, name *string, quantity *int, cost *float32, lastSupplyDate *time.Time) error
 		DeleteByID(ctx context.Context, id uint64) error
@@ -46,10 +47,11 @@ func newWarehouseRoutes(g *gin.RouterGroup, warehouseService WarehouseService) {
 
 	items := g.Group("/item")
 	{
-		items.GET("/", itemsR.getItems)
-		items.POST("/", itemsR.createItem)
-		items.PATCH("/:id", itemsR.updateItem)
-		items.DELETE("/:id", itemsR.deleteItem)
+		items.GET("", itemsR.getItems)
+		items.GET(":id", itemsR.getItemByID)
+		items.POST("", itemsR.createItem)
+		items.PATCH(":id", itemsR.updateItem)
+		items.DELETE(":id", itemsR.deleteItem)
 	}
 }
 
@@ -66,6 +68,27 @@ func (r *itemsRoutes) getItems(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, items)
+}
+
+func (r *itemsRoutes) getItemByID(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "specified id is not a number"})
+		return
+	}
+
+	item, err := r.warehouseService.GetItemByID(c, id)
+	if err != nil {
+		if errors.Is(err, service.ErrItemNotExists) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "item with such ID does not exist"})
+		} else {
+			slog.Error("failed to get item", sl.Err(err))
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed get items"})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, item)
 }
 
 func (r *itemsRoutes) createItem(c *gin.Context) {

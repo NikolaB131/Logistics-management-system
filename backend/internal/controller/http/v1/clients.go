@@ -43,10 +43,10 @@ func newClientsRoutes(g *gin.RouterGroup, clientsService ClientsService) {
 
 	clients := g.Group("/client")
 	{
-		clients.GET("/", clientsR.getClients)
-		clients.POST("/", clientsR.createClient)
-		clients.PATCH("/:id", clientsR.updateClient)
-		clients.DELETE("/:id", clientsR.deleteClient)
+		clients.GET("", clientsR.getClients)
+		clients.POST("", clientsR.createClient)
+		clients.PATCH(":id", clientsR.updateClient)
+		clients.DELETE(":id", clientsR.deleteClient)
 	}
 }
 

@@ -21,8 +21,8 @@ const Table = forwardRef<TableHandle, Props>(function Table(
     getSelectedIDs() {
       const res: string[] = [];
       checksRefs.current.forEach(el => {
-        const id = el?.textContent;
-        if (id) {
+        const id = el?.getAttribute('data-id');
+        if (el?.checked && id) {
           res.push(id);
         }
       });
@@ -54,7 +54,7 @@ const Table = forwardRef<TableHandle, Props>(function Table(
           <tr key={row[0]}>
             {!withoutSelect && (
               <td>
-                <input ref={el => (checksRefs.current[i] = el)} type="checkbox" />
+                <input ref={el => (checksRefs.current[i] = el)} type="checkbox" data-id={row[0]} />
               </td>
             )}
             {row.map((value, j) => (

@@ -80,11 +80,11 @@ func newOrdersRoutes(g *gin.RouterGroup, ordersService OrdersService) {
 
 	orders := g.Group("/order")
 	{
-		orders.GET("/", ordersR.getOrders)
-		orders.POST("/", ordersR.createOrder)
-		orders.PATCH("/:id", ordersR.updateOrder)
-		orders.PATCH("/finish/:id", ordersR.finishOrder)
-		orders.DELETE("/:id", ordersR.deleteOrder)
+		orders.GET("", ordersR.getOrders)
+		orders.POST("", ordersR.createOrder)
+		orders.PATCH(":id", ordersR.updateOrder)
+		orders.PATCH("finish/:id", ordersR.finishOrder)
+		orders.DELETE(":id", ordersR.deleteOrder)
 	}
 }
 
