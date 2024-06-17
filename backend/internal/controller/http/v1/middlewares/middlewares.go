@@ -1,26 +1,33 @@
 package middlewares
 
 import (
+	"context"
 	"log/slog"
 	"net/http"
 	"strings"
 
 	"github.com/NikolaB131/logistics-management-system/config"
 	"github.com/NikolaB131/logistics-management-system/internal/app/jwt"
-	"github.com/NikolaB131/logistics-management-system/internal/repository"
+	"github.com/NikolaB131/logistics-management-system/internal/entity"
 	"github.com/gin-gonic/gin"
 )
 
-type Middlewares struct {
-	config         *config.Config
-	userRepository repository.User
-}
+type (
+	userRepository interface {
+		User(ctx context.Context, email string) (entity.User, error)
+	}
+
+	Middlewares struct {
+		config         *config.Config
+		userRepository userRepository
+	}
+)
 
 var (
 	ErrParsingJWT = "error while parsing JWT token"
 )
 
-func New(config *config.Config, userRepository repository.User) Middlewares {
+func New(config *config.Config, userRepository userRepository) Middlewares {
 	return Middlewares{
 		config:         config,
 		userRepository: userRepository,

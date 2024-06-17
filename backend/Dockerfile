@@ -8,4 +8,4 @@ WORKDIR /app
 
 RUN make build-linux
 
-CMD ["./bin/app"]
+CMD ["./build/bin/app"]

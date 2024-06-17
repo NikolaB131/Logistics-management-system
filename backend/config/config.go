@@ -45,7 +45,7 @@ func NewConfig(path *string) (*Config, error) {
 		if err != nil {
 			return nil, fmt.Errorf("config geting executable filepath error: %w", err)
 		}
-		yamlFilePath = filepath.Join(executablePath, "../../config.yml")
+		yamlFilePath = filepath.Join(executablePath, "../../../config.yml")
 	} else {
 		yamlFilePath = *path
 	}

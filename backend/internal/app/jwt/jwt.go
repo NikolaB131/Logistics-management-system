@@ -9,11 +9,11 @@ import (
 
 type JWTClaims struct {
 	jwt.RegisteredClaims
-	UserID string `json:"id"`
+	UserID uint64 `json:"id"`
 	Email  string `json:"email"`
 }
 
-func Generate(signSecret string, tokenTTL time.Duration, id string, email string) (string, error) {
+func Generate(signSecret string, tokenTTL time.Duration, id uint64, email string) (string, error) {
 	claims := JWTClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(tokenTTL)),

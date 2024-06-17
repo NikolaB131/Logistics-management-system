@@ -36,9 +36,17 @@ func main() {
 
 	// Repositories
 	userRepository := postgresRepo.NewUserRepository(pg)
+	clientRepository := postgresRepo.NewClientRepository(pg)
+	couriersRepository := postgresRepo.NewCouriersRepository(pg)
+	itemsRepository := postgresRepo.NewItemsRepository(pg)
+	ordersRepository := postgresRepo.NewOrdersRepository(pg)
 
 	// Services
 	authService := service.NewAuthService(userRepository, config.Auth.SignSecret, config.Auth.TokenTTL)
+	clientsService := service.NewClientsService(clientRepository)
+	couriersService := service.NewCouriersService(couriersRepository)
+	warehouseService := service.NewWarehouseService(itemsRepository)
+	ordersService := service.NewOrdersService(ordersRepository, itemsRepository)
 
 	// Creating admin user
 	adminID, err := authService.RegisterUser(context.Background(), config.Auth.AdminUsername, config.Auth.AdminPassword)
@@ -57,7 +65,7 @@ func main() {
 
 	// Routes
 	r := gin.New()
-	v1.NewRouter(r, middlewares, authService)
+	v1.NewRouter(r, middlewares, authService, clientsService, couriersService, warehouseService, ordersService)
 
 	r.Run(fmt.Sprintf(":%d", config.HTTP.Port))
 }

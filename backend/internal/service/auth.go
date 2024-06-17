@@ -20,10 +20,16 @@ type (
 		MakeAdmin(ctx context.Context, userID string) error
 	}
 
+	userRepository interface {
+		User(ctx context.Context, email string) (entity.User, error)
+		SaveUser(ctx context.Context, user entity.User) (string, error)
+		GrantAdminPermission(ctx context.Context, userID string) error
+	}
+
 	Auth struct {
-		userRepository repository.User
-		signSecret     string
-		tokenTTL       time.Duration
+		userRepository
+		signSecret string
+		tokenTTL   time.Duration
 	}
 )
 
@@ -32,7 +38,7 @@ var (
 	ErrInvalidCredentials = errors.New("invalid credentials")
 )
 
-func NewAuthService(userRepository repository.User, signSecret string, tokenTTL time.Duration) *Auth {
+func NewAuthService(userRepository userRepository, signSecret string, tokenTTL time.Duration) *Auth {
 	return &Auth{
 		userRepository: userRepository,
 		signSecret:     signSecret,
